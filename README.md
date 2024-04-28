@@ -13,4 +13,4 @@
 7. 무한 스크롤 유저 페이지 생성
 8. 애플리케이션 배포
 
-노션 정리[https://www.notion.so/0aa353835b2647cea5c219dd9577ff80?v=543c503d04c349cbae303918f5230dd4&pvs=4]
+[노션 정리](https://rhinestone-fur-485.notion.site/0aa353835b2647cea5c219dd9577ff80?v=543c503d04c349cbae303918f5230dd4)
