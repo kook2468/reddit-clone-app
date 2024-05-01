@@ -5,12 +5,18 @@ import { isEmpty, validate } from "class-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cookie from "cookie";
+import userMiddleware from "../middlewares/user";
+import authMiddleware from "../middlewares/auth";
 
 const mapError = (errors: Object[]) => {
   return errors.reduce((prev: any, err: any) => {
     prev[err.property] = Object.entries(err.constraints)[0][1];
     return prev;
   }, {});
+};
+
+const me = async (_: Request, res: Response) => {
+  return res.json(res.locals.user);
 };
 
 const register = async (req: Request, res: Response) => {
@@ -97,8 +103,27 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
+const logout = async (_: Request, res: Response) => {
+  res.set(
+    "Set-Cookie",
+    cookie.serialize("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      expires: new Date(0),
+      path: "/",
+    })
+  );
+
+  res.status(200).json({ success: true });
+};
+
 const router = Router();
+//get : 서버에서 데이터를 가져와서 보여줄 때
+//post: 서버상의 데이터 값이나 상태를 바꿀 때(또는 보안관련한 정보와 함께 request할때. - login이 POST인 이유)
+router.get("/me", userMiddleware, authMiddleware, me);
 router.post("/register", register);
 router.post("/login", login);
+router.post("/logout", userMiddleware, authMiddleware, logout);
 
 export default router;

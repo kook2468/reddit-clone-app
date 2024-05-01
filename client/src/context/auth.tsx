@@ -1,5 +1,6 @@
 import { User } from "@/types";
-import React, { createContext, useContext, useReducer } from "react";
+import axios from "axios";
+import React, { createContext, useContext, useEffect, useReducer } from "react";
 
 interface State {
   authenticated: boolean;
@@ -15,7 +16,7 @@ interface Action {
 const StateContext = createContext<State>({
   authenticated: false,
   user: undefined,
-  loading: false,
+  loading: true,
 });
 
 const DispatchContext = createContext<any>(null);
@@ -51,11 +52,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loading: true,
   });
 
-  console.log("state", state);
-
   const dispatch = (type: string, payload?: any) => {
     defaultDispatch({ type, payload });
   };
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await axios.get("auth/me");
+        dispatch("LOGIN", res.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        dispatch("STOP_LOADING");
+      }
+    }
+    loadUser();
+  }, []); //해당 컴포너트 mount 시 바로 호출
 
   return (
     <DispatchContext.Provider value={dispatch}>

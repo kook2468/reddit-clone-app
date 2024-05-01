@@ -15,6 +15,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     //유저 정보를 res.locals.user에 넣어주기
     res.locals.user = user;
+    return next();
     console.log("user", user);
   } catch (error) {
     console.error(error);
