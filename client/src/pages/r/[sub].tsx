@@ -1,5 +1,7 @@
+import PostCard from "@/components/PostCard";
 import SideBar from "@/components/SideBar";
 import { useAuthState } from "@/context/auth";
+import { Post } from "@/types";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -13,7 +15,11 @@ const SubPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const subName = router.query.sub; //[sub]안의 값
-  const { data: sub, error } = useSWR(subName ? `/subs/${subName}` : null);
+  const {
+    data: sub,
+    error,
+    mutate,
+  } = useSWR(subName ? `/subs/${subName}` : null);
   console.log("sub", sub);
 
   useEffect(() => {
@@ -51,6 +57,19 @@ const SubPage = () => {
       fileInput.click();
     }
   };
+
+  let renderPosts;
+  if (!sub) {
+    renderPosts = <p className="text-lg text-center">로딩중...</p>;
+  } else if (sub.posts.length === 0) {
+    renderPosts = (
+      <p className="text-lg text-center">아직 작성된 포스트가 없습니다.</p>
+    );
+  } else {
+    renderPosts = sub.posts.map((post: Post) => (
+      <PostCard key={post.identifier} post={post} subMutate={mutate} />
+    ));
+  }
 
   return (
     <>
@@ -114,7 +133,8 @@ const SubPage = () => {
           {/* 포스트와 사이드바 */}
           <div className="flex max-w-5xl px-4 pt-5 mx-auto">
             {/* 포스트 */}
-            <div className="w-full md:mr-3 md:w-8/12"></div>
+            <div className="w-full md:mr-3 md:w-8/12">{renderPosts}</div>
+            {/* 사이드바 */}
             <SideBar sub={sub} />
           </div>
         </>
