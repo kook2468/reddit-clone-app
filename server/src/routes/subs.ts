@@ -79,6 +79,19 @@ const getSub = async (req: Request, res: Response) => {
   try {
     const sub = await Sub.findOneByOrFail({ name });
 
+    //해당 sub에 속하는 포스트 정보들을 넣어주기
+    const posts = await Post.find({
+      where: { subname: sub.name },
+      order: { createdAt: "DESC" },
+      relations: ["comments", "votes"],
+    });
+
+    sub.posts = posts;
+
+    if (res.locals.user) {
+      sub.posts.forEach((p) => p.setUserVote(res.locals.user));
+    }
+
     return res.json(sub);
   } catch (error) {
     return res.status(404).json({ error: "커뮤니티를 찾을 수 없습니다." });
