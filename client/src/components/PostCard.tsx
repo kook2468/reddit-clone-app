@@ -10,7 +10,8 @@ import React from "react";
 
 interface PostCardProps {
   post: Post;
-  subMutate: () => void;
+  subMutate?: () => void;
+  mutate?: () => void;
 }
 
 const PostCard = ({
@@ -28,6 +29,7 @@ const PostCard = ({
     username,
     sub,
   },
+  mutate,
   subMutate,
 }: PostCardProps) => {
   //Vote
@@ -49,7 +51,8 @@ const PostCard = ({
         slug,
         value,
       });
-      subMutate();
+      if (mutate) mutate();
+      if (subMutate) subMutate();
     } catch (error) {
       console.log(error);
     }
